@@ -1,0 +1,7 @@
+---
+ #Default values for php.ini. Overwrite in playbook if needed.
+ timezone: "Europe/Amsterdam"
+ max_input_time: "600"
+ max_execution_time: "600"
+ upload_max_filesize: "250M"
+ post_max_size: "250M"
