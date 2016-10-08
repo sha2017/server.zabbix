@@ -47,4 +47,4 @@
   - include: debian-post-install.yml
     when: ansible_os_family == "Debian"
 
-  - debug: msg="Remember for a new zabbix server to import an sql file. you can do this be defining an extra var at playbook execution --extra-vars='database_first_import=true'"
+  - debug: msg="Remember for a new zabbix server to import a sql file. you can do this be defining an extra var at playbook execution --extra-vars='database_first_import=true'"
