@@ -1,0 +1,52 @@
+---
+  - name: "Debian | Installing repository Debian"
+    apt_repository: repo="deb http://repo.zabbix.com/zabbix/3.0/debian/ {{ ansible_distribution_release }} main" state=present
+    when: ansible_distribution == "Debian"
+
+  - name: "Debian | Install gpg key"
+    apt_key: id=79EA5ED4 url=http://repo.zabbix.com/zabbix-official-repo.key
+    when: ansible_distribution == "Debian"
+
+  - name: "Debian | Installing zabbix-server on a Debian eco system"
+    apt: pkg={{item}} state=present update_cache=yes
+    with_items:
+      - zabbix-server-mysql
+      - zabbix-frontend-php
+      - zabbix-agent
+      - php5-mysql
+      - python-psycopg2 #Ansible dependency package
+      - mysql-client
+      - python-mysqldb
+    when: ansible_distribution == "Debian"
+
+  - name: PHP Setting timezone to {{timezone}}
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp="date.timezone" insertafter="^; date.timezone" line="date.timezone = {{timezone}}" backrefs=yes backup=yes
+    when: ansible_os_family == "Debian"
+
+  - name: PHP Setting Max execution time {{max_execution_time}}
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp="max_execution_time = " insertafter="^max_execution_time = " line="max_execution_time = {{max_execution_time}}" backrefs=yes backup=yes
+    when: ansible_os_family == "Debian"
+
+  - name: PHP Setting input time to {{max_input_time}}
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp="max_input_time = " insertafter="^max_input_time = " line="max_input_time = {{max_input_time}}" backrefs=yes backup=yes
+    when: ansible_os_family == "Debian"
+
+  - name: Set upload_max_files size to {{upload_max_filesize}}
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp="upload_max_filesize = " insertafter="^;upload_max_filesize" line="upload_max_filesize = {{upload_max_filesize}}" backrefs="yes" backup=yes
+    when: ansible_os_family == "Debian"
+
+  - name: Set post_max_size to {{post_max_size}}
+    lineinfile: dest=/etc/php5/apache2/php.ini regexp="post_max_size" insertafter="^;post_max_size" line="post_max_size = {{post_max_size}}" backrefs="yes" backup=yes
+    when: ansible_os_family == "Debian"
+
+##Can be made prettier by using another file. Next two commands are in debian.yml and centos.yml
+  - name: Create database {{zabbix_db_name}} for user {{zabbix_db_name}}
+    mysql_db: name={{zabbix_db_name}} state=present
+
+  - name: Managing database users
+    mysql_user: name={{zabbix_db_user}} host={{zabbix_db_srv}}  priv="{{zabbix_db_name}}.*:all" state=present
+    when: "{{database_create}}"
+
+  - name: Importing Zabbix database. Onetime only shot
+    mysql_db: name={{zabbix_db_name}} state=import target=/usr/share/doc/zabbix-server-mysql/create.sql.gz
+    when: database_first_import is defined and "{{database_first_import}}" and ansible_os_family == "Debian"
