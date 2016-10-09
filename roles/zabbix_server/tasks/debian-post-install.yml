@@ -5,3 +5,4 @@
       - zabbix-server
       - zabbix-agent
       - apache2  
+    when: restart_needed.changed

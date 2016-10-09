@@ -5,3 +5,4 @@
       - zabbix-server
       - zabbix-agent
       - httpd  
+    when: restart_needed.changed
