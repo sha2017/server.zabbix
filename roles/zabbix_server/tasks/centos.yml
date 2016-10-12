@@ -34,7 +34,7 @@
     register: restart_needed
 
 ##Can be made prettier by using another file. Next two commands are in debian.yml and centos.yml
-  - name: Create database {{zabbix_db_name}} for user {{zabbix_db_name}}
+  - name: Create database {{zabbix_db_name}} for user {{zabbix_db_user}}
     mysql_db: name={{zabbix_db_name}} state=present
 
   - name: Managing database users
